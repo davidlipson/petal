@@ -1,0 +1,101 @@
+#root {
+  height: 100vh;
+}
+
+.App {
+  text-align: center;
+  /*background-color: #a6feb7; option 1*/
+  width: 100%;
+  height: 100%;
+}
+
+#map-div {
+  background: radial-gradient(#bdddff, #b5ecd6) !important; /*option 2*/
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+#mapSvg {
+  margin: 0 auto;
+}
+
+#direction-container {
+  display: flex;
+  flex-direction: row;
+  height: 75px;
+  margin-left: 25px;
+  margin-right: 25px;
+  position: relative;
+  bottom: 100px;
+}
+
+#route-info {
+  width: 80%;
+  bottom: 100px;
+}
+
+#direction-container div {
+  background-color: white;
+  opacity: 0.6;
+  border-radius: 5px;
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#toggle-mode {
+  position: relative;
+  width: 20%;
+  margin-left: 2%;
+}
+
+#toggle-mode:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+#search-bar,
+#loading {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  left: 20px;
+  top: 20px;
+  position: absolute;
+  opacity: 0.8;
+  z-index: 1000;
+}
+
+#search-bar input:first-of-type {
+  margin-bottom: 5px !important;
+}
+
+.suggestion-button {
+  width: 200px;
+  background-color: white;
+  border: none;
+  padding: 10px;
+}
+
+#suggestions {
+  margin-top: 5px;
+}
+
+.suggestion-button:hover {
+  cursor: pointer;
+  background-color: antiquewhite;
+}
+
+#search-button {
+  margin-top: 5px;
+}
+
+#search-button:hover {
+  cursor: pointer;
+}
