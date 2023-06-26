@@ -55,24 +55,10 @@ class RouteGraph {
         throw new Error("No path found");
     }
     getDirections() {
-        const path = this.getPath("START-TERMINUS", "END-TERMINUS");
+        const path = this.getPath("CURRENT-POSITION", "ENDING-POSITION");
         const directions = [];
         path.forEach((edge, i) => {
-            const ord = edge.ordinalDirection();
-            if (i === 0) {
-                directions.push(new direction_1.Direction(`GO ${edge.ordinalDirection()} on ${edge.street_name}`, edge, ord, direction_1.Relative.FORWARD));
-            }
-            else {
-                const prev = path[i - 1];
-                const relativeDirection = prev.relativeDirection(edge);
-                if (relativeDirection === direction_1.Relative.FORWARD ||
-                    prev.street_name === edge.street_name) {
-                    directions.push(new direction_1.Direction(`CONTINUE on ${edge.street_name}`, edge, ord, direction_1.Relative.FORWARD));
-                }
-                else {
-                    directions.push(new direction_1.Direction(`TURN ${relativeDirection} onto ${edge.street_name}`, edge, ord, relativeDirection));
-                }
-            }
+            directions.push(new direction_1.Direction(edge, edge.ordinalDirection(), i === 0 ? direction_1.Relative.FORWARD : edge.relativeDirection(path[i - 1])));
         });
         return directions;
     }

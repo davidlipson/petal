@@ -59,7 +59,7 @@ class Map extends React.Component<MapProps> {
           <StreetsBaseLayer path={path} layer={this.props.mapData.streets} />
           <PropertyBaseLayer path={path} layer={this.props.mapData.properties} />
           <ParksBaseLayer path={path} layer={this.props.mapData.parks} />
-          <BikeShareBaseLayer hide={this.props.step === null} path={path}/>
+          <BikeShareBaseLayer hide={this.props.step === null} path={path} zoom={this.props.zoom}/>
           <LightsBaseLayer hide={true || this.props.step === null} path={path} layer={this.props.mapData.signals}/>
           <RouteLayer directions={this.props.directions} step={this.props.step} path={path} layer={this.props.routeData} />
           <CurrentPin path={path} width={800} height={800} current={this.props.current} />

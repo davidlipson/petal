@@ -19,17 +19,14 @@ export enum Relative {
 }
 
 export class Direction {
-  directive: string;
   edge: Edge;
   cardinality: Cardinal;
   relative: Relative;
   constructor(
-    directive: string,
     edge: Edge,
     cardinality: Cardinal,
     relative: Relative
   ) {
-    this.directive = directive;
     this.cardinality = cardinality;
     this.relative = relative;
     this.edge = edge;

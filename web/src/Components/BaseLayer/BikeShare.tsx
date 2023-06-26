@@ -50,19 +50,45 @@ export class BikeShareBaseLayer extends React.Component<
   }
 
   render(): React.ReactNode {
-    if (this.props.hide || this.state.layer === undefined) return <></>;
+    if (
+      (this.props.zoom && this.props.zoom > 0.3) ||
+      this.props.hide ||
+      this.state.layer === undefined
+    )
+      return <></>;
     return (
       <>
         {this.state.layer?.features?.map((d, i) => (
-          <circle
-            key={"bike-share" + i}
-            cx={this.props.path.centroid(d)[0]}
-            cy={this.props.path.centroid(d)[1]}
-            fill="rgb(78,171,80)"
-            stroke="rgb(42,100,75)"
-            strokeWidth={1.5}
-            r={4}
-          />
+          <>
+            <circle
+              key={"bike-share-outer" + i}
+              cx={this.props.path.centroid(d)[0]}
+              cy={this.props.path.centroid(d)[1]}
+              fill="white"
+              opacity={0.2}
+              stroke="white"
+              strokeWidth={2}
+              r={16}
+            />
+            <circle
+              key={"bike-share-outer" + i}
+              cx={this.props.path.centroid(d)[0]}
+              cy={this.props.path.centroid(d)[1]}
+              fill="white"
+              stroke="rgb(42,100,75)"
+              strokeWidth={2}
+              r={12}
+            />
+            <circle
+              key={"bike-share" + i}
+              cx={this.props.path.centroid(d)[0]}
+              cy={this.props.path.centroid(d)[1]}
+              fill="rgb(78,171,80)"
+              stroke="rgb(42,100,75)"
+              strokeWidth={3}
+              r={8}
+            />
+          </>
         ))}
       </>
     );

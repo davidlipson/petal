@@ -24,6 +24,7 @@ export interface AppState {
   step: number | null;
   directions: any[] | null;
   mode: Mode | null;
+  zoom: number;
 }
 
 export default class App extends React.Component<{}, AppState> {
@@ -38,9 +39,10 @@ export default class App extends React.Component<{}, AppState> {
       addresses: [],
       step: null,
       directions: null,
+      zoom: 0.3, 
       current: { long: -79.42384, lat: 43.64453 },
       mapData: {} as Record<string, ExtendedFeatureCollection>,
-      mode: null,
+      mode: Mode.FULLVIEW,
     };
     this.search = this.search.bind(this);
     this.updateStep = this.updateStep.bind(this);
@@ -52,7 +54,7 @@ export default class App extends React.Component<{}, AppState> {
 
   setBaseLayer(lat?: number, long?: number): void {
     axios
-      .get(`http://localhost:3000/base?km=${0.6}&lat=${lat}&long=${long}`)
+      .get(`http://localhost:3000/base?km=${this.state.zoom}&lat=${lat}&long=${long}`)
       .then((res) => {
         this.setState({
           mapData: res.data,
@@ -99,7 +101,7 @@ export default class App extends React.Component<{}, AppState> {
         res.data.directions.forEach(
           (direction: {
             direction: any;
-            edge: { geometry: GeoJSON.MultiLineString; road_type: string };
+            edge: { geometry: GeoJSON.MultiLineString; road_type: string; a_name: string; b_name: string };
           }) => {
             directions.push(direction);
             features.push({
@@ -107,6 +109,8 @@ export default class App extends React.Component<{}, AppState> {
               geometry: direction.edge.geometry,
               properties: {
                 road_type: direction.edge.road_type,
+                a_name: direction.edge.a_name,
+                b_name: direction.edge.b_name,
               },
             });
           }
@@ -134,7 +138,7 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   toggleView = (): void => {
-    if (this.state.mode === Mode.FULLVIEW) {
+    if (this.state.mode === Mode.FULLVIEW && this.state.step !== null) {
       this.setState({ mode: Mode.DIRECTIONS });
     } else {
       this.setState({ mode: Mode.FULLVIEW });
@@ -156,6 +160,7 @@ export default class App extends React.Component<{}, AppState> {
             mapData={this.state.mapData}
             routeData={this.state.routeData}
             directions={this.state.directions}
+            zoom={this.state.zoom}
           />
         )}
         <div id="direction-container">
@@ -166,7 +171,7 @@ export default class App extends React.Component<{}, AppState> {
               directions={this.state.directions}
             />
           )}
-          {this.state.mode && (
+          {this.state.mode && this.state.step !== null && (
             <ToggleMode
               mode={this.state.mode}
               toggleMode={this.toggleView}

@@ -12,13 +12,6 @@ export class RouteLayer extends React.Component<RouteProps> {
   }
 
   roadColor(roadType: number, idx: number): string {
-    if (idx === this.props.step) return "#0022F0";
-    if (
-      this.props.step !== null &&
-      this.props.step !== undefined &&
-      idx === this.props.step + 1
-    )
-      return "#00AFDC";
     switch (roadType) {
       case 203001:
         return "blue";
@@ -28,11 +21,6 @@ export class RouteLayer extends React.Component<RouteProps> {
   }
 
   roadWidth(idx: number): number {
-    if (
-      idx === this.props.step ||
-      (this.props.step && idx === this.props.step + 1)
-    )
-      return 5;
     return 3;
   }
 
@@ -59,6 +47,7 @@ export class RouteLayer extends React.Component<RouteProps> {
                 stroke={this.roadColor(d.properties?.road_type, i)}
                 strokeWidth={this.roadWidth(i)}
                 fill="none"
+                stroke-dasharray={d.properties?.a_name === 'CURRENT-POSITION' || d.properties?.b_name === 'ENDING-POSITION' ? 3 : 0}
               />
             </>
           );

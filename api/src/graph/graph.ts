@@ -67,67 +67,14 @@ export class RouteGraph {
   }
 
   getDirections(): Direction[] {
-    const path = this.getPath("START-TERMINUS", "END-TERMINUS");
-    /*
-     const direction = this.props.directions[this.props.step];
-    const nextDirection = this.props.directions[this.props.step + 1];
-    const isSecondLastStep =
-      this.props.step === this.props.directions.length - 2;
-    const isLastStep = this.props.step === this.props.directions.length - 1;
-    const isFirstStep = this.props.step === 0;
-    const isForward = nextDirection.relative === "FORWARD";
-    return (
-      <div id="route-info">
-        <div className="route-info-header">
-          {isLastStep
-            ? "You have ARRIVED"
-            : isSecondLastStep
-            ? `You will ARRIVE IN ${this.toMeters(
-                direction.edge.street_length
-              )}`
-            : isFirstStep || isForward
-            ? `GO ${direction.cardinality} on ${
-                direction.edge.street_name
-              } for ${this.toMeters(direction.edge.street_length)}`
-            : `IN ${this.toMeters(direction.edge.street_length)} ${
-                nextDirection.directive
-              }`}
-        </div>
-      </div>*/
-
-      // FIX
-
+    const path = this.getPath("CURRENT-POSITION", "ENDING-POSITION");
     const directions: Direction[] = [];
     path.forEach((edge: Edge, i: number) => {
-      let directive = "";
-      let relativeDirection = Relative.FORWARD;
-      let ord = edge.ordinalDirection();
-      if(i === path.length - 1) {
-      }
-
-      else{
-        
-      }
-      
-      if (i === 0) {
-        directive = `HEAD ${edge.ordinalDirection()} on ${
-          edge.street_name
-        } and ${directive}`;
-      }
-
-
-      if (i === 0) {
-        directive = `HEAD ${edge.ordinalDirection()} on ${
-          edge.street_name
-        } and ${directive}`;
-      }
-
       directions.push(
         new Direction(
-          directive,
           edge,
-          ord,
-          relativeDirection
+          edge.ordinalDirection(),
+          i === 0 ? Relative.FORWARD : edge.relativeDirection(path[i - 1]),
         )
       );
     });

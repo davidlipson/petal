@@ -20,8 +20,7 @@ var Relative;
     Relative["BACKWARD"] = "BACKWARD";
 })(Relative = exports.Relative || (exports.Relative = {}));
 class Direction {
-    constructor(directive, edge, cardinality, relative) {
-        this.directive = directive;
+    constructor(edge, cardinality, relative) {
         this.cardinality = cardinality;
         this.relative = relative;
         this.edge = edge;

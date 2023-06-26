@@ -8,6 +8,8 @@ export interface CurrentPinProps {
   height: number;
 }
 
+export const PIN_COLOUR = "#FAA8A0"
+
 export class CurrentPin extends React.Component<CurrentPinProps> {
   constructor(props: CurrentPinProps) {
     super(props);
@@ -31,7 +33,7 @@ export class CurrentPin extends React.Component<CurrentPinProps> {
               cx={this.props.path.centroid(feature)[0]}
               cy={this.props.path.centroid(feature)[1]}
               r={10}
-              fill="#EDBCCC"
+              fill={PIN_COLOUR}
               opacity={0.5}
               key={"current-back"}
             >
@@ -48,7 +50,7 @@ export class CurrentPin extends React.Component<CurrentPinProps> {
               cy={this.props.path.centroid(feature)[1]}
               r={5}
               fill="#EEE"
-              stroke="#EDBCCC"
+              stroke={PIN_COLOUR}
               strokeWidth={2}
             />
           </>

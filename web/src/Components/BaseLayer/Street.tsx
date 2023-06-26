@@ -4,6 +4,7 @@ export interface BaseLayerProps {
   layer?: d3.ExtendedFeatureCollection;
   path: d3.GeoPath<any, d3.GeoPermissibleObjects>;
   hide?: boolean;
+  zoom?: number;
 }
 
 export class StreetsBaseLayer extends React.Component<BaseLayerProps> {
@@ -37,7 +38,7 @@ export class StreetsBaseLayer extends React.Component<BaseLayerProps> {
       renderedStreets[d.properties?.street_name] =
         renderedStreets[d.properties?.street_name] + 1 || 0;
       console.log(renderedStreets);
-      const renderStreetName = renderedStreets[d.properties?.street_name] === 0;
+      const renderStreetName = false // renderedStreets[d.properties?.street_name] === 0;
       return (
         <>
           <path
