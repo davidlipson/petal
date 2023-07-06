@@ -2,6 +2,7 @@ import axios from "axios";
 import { ExtendedFeature, ExtendedFeatureCollection } from "d3-geo";
 import React from "react";
 import { BaseLayerProps } from "./Street";
+import { ZOOM_IN } from "../../App";
 
 export interface BikeShareState {
   layer: ExtendedFeatureCollection | null;
@@ -51,7 +52,7 @@ export class BikeShareBaseLayer extends React.Component<
 
   render(): React.ReactNode {
     if (
-      (this.props.zoom && this.props.zoom > 0.3) ||
+      (this.props.zoom && this.props.zoom > ZOOM_IN) ||
       this.props.hide ||
       this.state.layer === undefined
     )

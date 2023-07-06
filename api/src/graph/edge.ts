@@ -1,4 +1,5 @@
 import { Cardinal, Relative } from "../direction";
+import { ROAD_TYPE } from "./road-types";
 
 export interface EdgeParams {
   street_name: string;
@@ -20,7 +21,7 @@ export class Edge {
   a_geometry: JSON;
   b_geometry: JSON;
   street_length: number;
-  road_type: number;
+  road: {id: number, name: string};
   street_name: string;
   departing_angle: number; // angle leaving a node
   arriving_angle: number; // angle arriving at b node
@@ -48,7 +49,7 @@ export class Edge {
     this.a_name = a_name;
     this.b_name = b_name;
     this.street_length = street_length;
-    this.road_type = road_type;
+    this.road = {id: road_type, name: ROAD_TYPE[road_type]};
     this.weighted_length = weighted_length;
     this.a_geometry = a_geometry;
     this.b_geometry = b_geometry;

@@ -1,0 +1,31 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ROAD_TYPE = void 0;
+exports.ROAD_TYPE = {
+    201100: "Expressway",
+    201101: "Expressway Ramp",
+    201200: "Major Arterial",
+    201201: "Major Arterial Ramp",
+    201300: "Minor Arterial",
+    201301: "Minor Arterial Ramp",
+    201400: "Collector",
+    201401: "Collector Ramp",
+    201500: "Local",
+    201600: "Other",
+    201601: "Other Ramp",
+    201700: "Laneway",
+    201800: "Pending",
+    201801: "Busway",
+    201803: "Access Road",
+    202001: "Major Railway",
+    202002: "Minor Railway",
+    203001: "River",
+    203002: "Creek/Tributary",
+    204001: "Trail",
+    204002: "Walkway",
+    205001: "Hydro Line",
+    206001: "Major Shoreline",
+    206002: "Minor Shoreline (Land locked)",
+    207001: "Geostatistical line",
+    208001: "Ferry Route",
+};

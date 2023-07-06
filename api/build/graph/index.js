@@ -17,3 +17,4 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./weights"), exports);
 __exportStar(require("./graph"), exports);
 __exportStar(require("./edge"), exports);
+__exportStar(require("./road-types"), exports);

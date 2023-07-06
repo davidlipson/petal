@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Edge = void 0;
 const direction_1 = require("../direction");
+const road_types_1 = require("./road-types");
 class Edge {
     constructor(args) {
         const { street_name, departing_angle, arriving_angle, geometry, a_name, b_name, street_length, road_type, weighted_length, a_geometry, b_geometry, } = args;
@@ -12,7 +13,7 @@ class Edge {
         this.a_name = a_name;
         this.b_name = b_name;
         this.street_length = street_length;
-        this.road_type = road_type;
+        this.road = { id: road_type, name: road_types_1.ROAD_TYPE[road_type] };
         this.weighted_length = weighted_length;
         this.a_geometry = a_geometry;
         this.b_geometry = b_geometry;

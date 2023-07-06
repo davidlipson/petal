@@ -44,7 +44,7 @@ export class RouteLayer extends React.Component<RouteProps> {
                 }}
                 key={"route" + i}
                 d={this.props.path(d) as string}
-                stroke={this.roadColor(d.properties?.road_type, i)}
+                stroke={this.roadColor(d.properties?.road?.id, i)}
                 strokeWidth={this.roadWidth(i)}
                 fill="none"
                 stroke-dasharray={d.properties?.a_name === 'CURRENT-POSITION' || d.properties?.b_name === 'ENDING-POSITION' ? 3 : 0}

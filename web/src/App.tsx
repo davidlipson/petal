@@ -2,11 +2,7 @@ import React from "react";
 import "./App.css";
 import Map from "./Map";
 import axios from "axios";
-import {
-  ExtendedFeature,
-  ExtendedFeatureCollection,
-  ExtendedGeometryCollection,
-} from "d3-geo";
+import { ExtendedFeature, ExtendedFeatureCollection } from "d3-geo";
 import { Search } from "./Search";
 import { Directions, ToggleMode } from "./Components";
 
@@ -14,6 +10,9 @@ export enum Mode {
   FULLVIEW = "FULLVIEW",
   DIRECTIONS = "DIRECTIONS",
 }
+
+export const ZOOM_OUT = 0.75;
+export const ZOOM_IN = 0.25;
 
 export interface AppState {
   routeData: ExtendedFeatureCollection;
@@ -39,7 +38,7 @@ export default class App extends React.Component<{}, AppState> {
       addresses: [],
       step: null,
       directions: null,
-      zoom: 0.3, 
+      zoom: ZOOM_OUT,
       current: { long: -79.42384, lat: 43.64453 },
       mapData: {} as Record<string, ExtendedFeatureCollection>,
       mode: Mode.FULLVIEW,
@@ -54,7 +53,9 @@ export default class App extends React.Component<{}, AppState> {
 
   setBaseLayer(lat?: number, long?: number): void {
     axios
-      .get(`http://localhost:3000/base?km=${this.state.zoom}&lat=${lat}&long=${long}`)
+      .get(
+        `http://localhost:3000/base?km=${this.state.zoom}&lat=${lat}&long=${long}`
+      )
       .then((res) => {
         this.setState({
           mapData: res.data,
@@ -78,7 +79,6 @@ export default class App extends React.Component<{}, AppState> {
       this.state.directions &&
       this.state.directions.length > step
     ) {
-      console.log("test");
       const position: GeoJSON.Point =
         this.state.directions[step].edge.a_geometry;
       this.setBaseLayer(position.coordinates[1], position.coordinates[0]);
@@ -89,7 +89,7 @@ export default class App extends React.Component<{}, AppState> {
   search(start_address: string, end_address: string): void {
     const start = encodeURIComponent(start_address);
     const end = encodeURIComponent(end_address);
-    this.setState({ loading: true });
+    this.setState({ loading: true, zoom: ZOOM_IN, mode: Mode.DIRECTIONS });
     axios
       .get(
         `http://localhost:3000/route?start_address=${start}&end_address=${end}`
@@ -101,14 +101,19 @@ export default class App extends React.Component<{}, AppState> {
         res.data.directions.forEach(
           (direction: {
             direction: any;
-            edge: { geometry: GeoJSON.MultiLineString; road_type: string; a_name: string; b_name: string };
+            edge: {
+              geometry: GeoJSON.MultiLineString;
+              road: {id: number; name: string;};
+              a_name: string;
+              b_name: string;
+            };
           }) => {
             directions.push(direction);
             features.push({
               type: "Feature",
               geometry: direction.edge.geometry,
               properties: {
-                road_type: direction.edge.road_type,
+                road: direction.edge.road,
                 a_name: direction.edge.a_name,
                 b_name: direction.edge.b_name,
               },
@@ -125,7 +130,6 @@ export default class App extends React.Component<{}, AppState> {
             type: "FeatureCollection",
             features,
           },
-          mode: Mode.DIRECTIONS,
           step: features.length > 0 ? 0 : null,
           directions,
           loading: false,
@@ -137,11 +141,15 @@ export default class App extends React.Component<{}, AppState> {
       });
   }
 
+  // fix this
   toggleView = (): void => {
     if (this.state.mode === Mode.FULLVIEW && this.state.step !== null) {
-      this.setState({ mode: Mode.DIRECTIONS });
+      this.setState({ mode: Mode.DIRECTIONS, zoom: ZOOM_IN });
     } else {
-      this.setState({ mode: Mode.FULLVIEW });
+      this.setState({ mode: Mode.FULLVIEW, zoom: ZOOM_OUT });
+    }
+    if (this.state.step !== null) {
+      this.updateStep(this.state.step);
     }
   };
 
@@ -172,10 +180,7 @@ export default class App extends React.Component<{}, AppState> {
             />
           )}
           {this.state.mode && this.state.step !== null && (
-            <ToggleMode
-              mode={this.state.mode}
-              toggleMode={this.toggleView}
-            />
+            <ToggleMode mode={this.state.mode} toggleMode={this.toggleView} />
           )}
         </div>
       </div>
