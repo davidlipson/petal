@@ -7,17 +7,31 @@ export interface ToggleModeProps {
   mode: Mode;
 }
 
-export class ToggleMode extends React.Component<ToggleModeProps> {
+export interface ToggleModeState {
+  show: boolean;
+}
+
+export class ToggleMode extends React.Component<
+  ToggleModeProps,
+  ToggleModeState
+> {
   constructor(props: ToggleModeProps) {
     super(props);
+    this.state = {
+      show: true,
+    };
   }
 
   // change this to dynamic, moving across screen instead of stationary center
   render(): React.ReactNode {
-    return (
-      <div onClick={this.props.toggleMode} id="toggle-mode">
-        <div>{this.props.mode}</div>
-      </div>
-    );
+    console.log(this.state);
+    if (this.state.show) {
+      return (
+        <div onClick={this.props.toggleMode} id="toggle-mode">
+          <div>{this.props.mode}</div>
+        </div>
+      );
+    }
+    return <></>;
   }
 }

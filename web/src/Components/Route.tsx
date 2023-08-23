@@ -32,26 +32,34 @@ export class RouteLayer extends React.Component<RouteProps> {
 
     return (
       <>
-        {features.map((d, i) => {
-          return (
-            <>
-              <path
-                onMouseEnter={() => {
-                  console.log(
-                    d.properties,
-                    this.props.directions ? this.props.directions[i] : null
-                  );
-                }}
-                key={"route" + i}
-                d={this.props.path(d) as string}
-                stroke={this.roadColor(d.properties?.road?.id, i)}
-                strokeWidth={this.roadWidth(i)}
-                fill="none"
-                stroke-dasharray={d.properties?.a_name === 'CURRENT-POSITION' || d.properties?.b_name === 'ENDING-POSITION' ? 3 : 0}
-              />
-            </>
-          );
-        })}
+        {features
+          .filter((f, i) => !this.props.step || i >= this.props.step)
+          .map((d, i) => {
+            return (
+              <>
+                <path
+                  onMouseEnter={() => {
+                    console.log(
+                      d.properties,
+                      directions ? directions[i] : null
+                    );
+                  }}
+                  key={"route" + i}
+                  d={this.props.path(d) as string}
+                  stroke={this.roadColor(d.properties?.road?.id, i)}
+                  strokeWidth={this.roadWidth(i)}
+                  opacity={0.7}
+                  fill="none"
+                  stroke-dasharray={
+                    d.properties?.a_name === "CURRENT-POSITION" ||
+                    d.properties?.b_name === "ENDING-POSITION"
+                      ? 3
+                      : 0
+                  }
+                />
+              </>
+            );
+          })}
       </>
     );
   }

@@ -5,10 +5,11 @@ import { poolInstance } from "../pool";
 
 export const route = async (req: Request, res: Response) => {
   const pool = poolInstance.getPool();
-  const { start_address, end_address } = req.query;
+  const { start_address, end_address, safety } = req.query;
+  const safetyLevel = Math.max(0, Math.min(4, parseInt(safety as string) || 0));
 
   if (!start_address || !end_address) {
-    res.status(400).send("Missing start_address or end_address");
+    res.status(400).send("Missing start or end address.");
     return;
   }
 
@@ -18,7 +19,8 @@ export const route = async (req: Request, res: Response) => {
       start_address as string,
       end_address as string
     );
-    const graph = new RouteGraph(rows);
+
+    const graph = new RouteGraph(rows, safetyLevel);
     const directions = graph.getDirections();
     return res.status(200).json({ directions });
   } catch (e: any) {

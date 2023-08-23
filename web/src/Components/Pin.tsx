@@ -2,10 +2,8 @@ import { ExtendedFeature } from "d3-geo";
 import React from "react";
 
 export interface CurrentPinProps {
-  current?: { long: number; lat: number };
+  current: { long: number; lat: number } | null;
   path: d3.GeoPath<any, d3.GeoPermissibleObjects>;
-  width: number;
-  height: number;
 }
 
 export const PIN_COLOUR = "#FAA8A0"

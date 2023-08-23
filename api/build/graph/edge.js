@@ -3,9 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Edge = void 0;
 const direction_1 = require("../direction");
 const road_types_1 = require("./road-types");
+const weights_1 = require("./weights");
 class Edge {
     constructor(args) {
-        const { street_name, departing_angle, arriving_angle, geometry, a_name, b_name, street_length, road_type, weighted_length, a_geometry, b_geometry, } = args;
+        const { street_name, departing_angle, arriving_angle, geometry, a_name, b_name, street_length, road_type, a_geometry, b_geometry, bike_lanes, } = args;
         this.street_name = street_name;
         this.departing_angle = departing_angle;
         this.arriving_angle = arriving_angle;
@@ -14,9 +15,22 @@ class Edge {
         this.b_name = b_name;
         this.street_length = street_length;
         this.road = { id: road_type, name: road_types_1.ROAD_TYPE[road_type] };
-        this.weighted_length = weighted_length;
         this.a_geometry = a_geometry;
         this.b_geometry = b_geometry;
+        this.bike_lanes = bike_lanes;
+    }
+    calculateWeightedLength(safetyLevel) {
+        if (safetyLevel >= 4) {
+            return this.safeEdge();
+        }
+        return this.street_length;
+    }
+    safeEdge() {
+        let factor = weights_1.WEIGHTS[this.road.id];
+        if (this.bike_lanes.length > 0) {
+            factor = factor * 0.5;
+        }
+        return this.street_length * factor;
     }
     cardinalDirection() {
         if (this.departing_angle <= 45 || this.departing_angle > 315) {

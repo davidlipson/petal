@@ -1,6 +1,5 @@
 import Graph from "node-dijkstra";
 import { Adjacency } from "../model";
-import { WEIGHTS } from "./weights";
 import { Direction, Relative } from "../direction";
 import { Edge } from "./edge";
 
@@ -9,7 +8,7 @@ export class RouteGraph {
   edges: Record<string, Record<string, Edge>>;
   route: Graph;
 
-  constructor(rows: Adjacency[] = []) {
+  constructor(rows: Adjacency[] = [], safetyLevel: number) {
     this.street_weights = {};
     this.edges = {};
     rows.forEach((row: Adjacency) => {
@@ -24,8 +23,8 @@ export class RouteGraph {
         departing_angle,
         arriving_angle,
         geometry,
+        bike_lanes,
       } = row;
-      const weighted_length = street_length * WEIGHTS[road_type];
       const newEdge = new Edge({
         street_name,
         departing_angle,
@@ -37,8 +36,9 @@ export class RouteGraph {
         b_name,
         street_length,
         road_type,
-        weighted_length,
+        bike_lanes,
       });
+      const weighted_length = newEdge.calculateWeightedLength(safetyLevel);
       if (a_name in this.street_weights) {
         this.street_weights[a_name][b_name] = weighted_length;
         this.edges[a_name][b_name] = newEdge;
@@ -63,22 +63,34 @@ export class RouteGraph {
       }
       return edges;
     }
-    throw new Error("No path found");
+    throw new Error("Couldn't find a route. Make sure your addresses are valid.");
   }
 
   getDirections(): Direction[] {
     const path = this.getPath("CURRENT-POSITION", "ENDING-POSITION");
     const directions: Direction[] = [];
+    let distance = 0;
     path.forEach((edge: Edge, i: number) => {
-      directions.push(
-        new Direction(
-          edge,
-          edge.ordinalDirection(),
-          i === 0 ? Relative.FORWARD : edge.relativeDirection(path[i - 1]),
-        )
-      );
-    });
+      if (i > 1) {
+        const ord = edge.ordinalDirection();
 
+        const prev = path[i - 1];
+        const relativeDirection = prev.relativeDirection(edge);
+        if (
+          relativeDirection === Relative.FORWARD ||
+          prev.street_name === edge.street_name
+        ) {
+          directions.push(new Direction(edge, ord, Relative.FORWARD));
+        } else {
+          directions.push(new Direction(edge, ord, relativeDirection));
+        }
+
+        distance += edge.street_length;
+        if (edge.street_name !== path[i - 1].street_name) {
+          console.log(edge.cardinalDirection(), edge.street_name);
+        }
+      }
+    });
     return directions;
   }
 }

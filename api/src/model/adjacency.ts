@@ -9,4 +9,5 @@ export interface Adjacency {
   departing_angle: number; // angle leaving a node
   arriving_angle:  number; // angle arriving at b node
   geometry: string;
+  bike_lanes: any[];
 }

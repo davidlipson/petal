@@ -27,18 +27,47 @@
 208001	Ferry Route
 */
 
-export const WEIGHTS: Record<number, number> = {
+const unweighted: Record<number, number> = {
+  201700: 1,
+  201500: 1,
+  205001: 0,
+  201100: 0, // highway?
+  201101: 0, // highway ramp?
+  201200: 1,
+  201201: 1,
+  201300: 1, // minor highways? confrm you can even bike on these
+  201301: 1, // minor highway ramp?
+  201400: 1, // major road?
+  201401: 1, // major road ramp?
+  201600: 1,
+  201601: 1,
+  201800: 1,
+  201801: 0,
+  201803: 1,
+  202001: 0,
+  202002: 0,
+  203001: 0,
+  203002: 0,
+  204001: 1,
+  204002: 1,
+  206001: 0,
+  206002: 0,
+  207001: 0,
+  208001: 0,
+};
+
+const weighted: Record<number, number> = {
     201700: 1,
     201500: 1,
     205001: 0,
     201100: 0, // highway?
     201101: 0, // highway ramp?
-    201200: 1,
-    201201: 1,
-    201300: 3, // minor highways? confrm you can even bike on these
-    201301: 3, // minor highway ramp?
-    201400: 2, // major road?
-    201401: 2, // major road ramp?
+    201200: 1.5,
+    201201: 1.5,
+    201300: 1.5, // minor highways? confrm you can even bike on these
+    201301: 1.5, // minor highway ramp?
+    201400: 1.5, // major road?
+    201401: 1.5, // major road ramp?
     201600: 1,
     201601: 1,
     201800: 1,
@@ -55,3 +84,5 @@ export const WEIGHTS: Record<number, number> = {
     207001: 0,
     208001: 0,
   };
+
+  export const WEIGHTS: Record<number, number> = weighted;

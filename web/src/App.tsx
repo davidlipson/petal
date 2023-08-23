@@ -3,33 +3,41 @@ import "./App.css";
 import Map from "./Map";
 import axios from "axios";
 import { ExtendedFeature, ExtendedFeatureCollection } from "d3-geo";
-import { Search } from "./Search";
-import { Directions, ToggleMode } from "./Components";
+import {
+  Directions,
+  DirectionsViewer,
+  ErrorBar,
+  MapLoading,
+  Search,
+  ToggleMode,
+} from "./Components";
+import { time } from "console";
+import { backgroundColourByTime } from "./helpers";
 
 export enum Mode {
-  FULLVIEW = "FULLVIEW",
+  SEARCH = "SEARCH",
   DIRECTIONS = "DIRECTIONS",
 }
-
-export const ZOOM_OUT = 0.75;
-export const ZOOM_IN = 0.25;
 
 export interface AppState {
   routeData: ExtendedFeatureCollection;
   loading: boolean;
   addresses: string[];
   mapData: Record<string, ExtendedFeatureCollection>;
-  current: { long: number; lat: number };
+  current: { long: number; lat: number } | null;
   step: number | null;
   directions: any[] | null;
-  mode: Mode | null;
+  mode: Mode;
   zoom: number;
+  error: string | null;
+  currentDate: Date;
 }
 
 export default class App extends React.Component<{}, AppState> {
   constructor(props: any) {
     super(props);
     this.state = {
+      error: null,
       routeData: {
         type: "FeatureCollection",
         features: [],
@@ -38,10 +46,11 @@ export default class App extends React.Component<{}, AppState> {
       addresses: [],
       step: null,
       directions: null,
-      zoom: ZOOM_OUT,
-      current: { long: -79.42384, lat: 43.64453 },
+      zoom: 0.5,
+      current: null,
       mapData: {} as Record<string, ExtendedFeatureCollection>,
-      mode: Mode.FULLVIEW,
+      mode: Mode.SEARCH,
+      currentDate: new Date(),
     };
     this.search = this.search.bind(this);
     this.updateStep = this.updateStep.bind(this);
@@ -51,25 +60,55 @@ export default class App extends React.Component<{}, AppState> {
   // zoom out to full view of route with two points as start and end + some extra buffer arround
   // change mapData to be full area of route but zoom in on DIRECTION VIEW
 
+  // add closest address from current location on mount
+
   setBaseLayer(lat?: number, long?: number): void {
-    axios
-      .get(
-        `http://localhost:3000/base?km=${this.state.zoom}&lat=${lat}&long=${long}`
-      )
-      .then((res) => {
-        this.setState({
-          mapData: res.data,
-          current: { long: long || -79.42384, lat: lat || 43.64453 },
-          loading: false,
+    if (lat && long) {
+      axios
+        .get(
+          `http://localhost:3000/base?km=${this.state.zoom}&lat=${lat}&long=${long}`
+        )
+        .then((res) => {
+          console.log(res);
+          this.setState({
+            mapData: res.data,
+            current: {
+              long,
+              lat,
+            } /*{ long: long || -79.42384, lat: lat || 43.64453 }*/,
+            loading: false,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    }
+  }
+
+  success = (position: GeolocationPosition): void => {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    console.log("Current location", latitude, longitude);
+    this.setBaseLayer(latitude, longitude);
+  };
+
+  error = (): void => {
+    this.setBaseLayer(43.64453, -79.42384);
+  };
+
+  setCurrentLocation(): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(this.success, this.error);
+    } else {
+      console.log("Geolocation not supported");
+    }
   }
 
   componentDidMount(): void {
-    this.setBaseLayer();
+    this.setCurrentLocation();
+    setInterval(() => {
+      this.setState({ currentDate: new Date() });
+    }, 10000); //  change distance between updates
   }
 
   updateStep = (step: number | null): void => {
@@ -86,13 +125,13 @@ export default class App extends React.Component<{}, AppState> {
   };
 
   // TODO fix error when address has symbols / apostrophe
-  search(start_address: string, end_address: string): void {
+  search(start_address: string, end_address: string, safety: number): void {
     const start = encodeURIComponent(start_address);
     const end = encodeURIComponent(end_address);
-    this.setState({ loading: true, zoom: ZOOM_IN, mode: Mode.DIRECTIONS });
+    this.setState({ loading: true, mode: Mode.DIRECTIONS });
     axios
       .get(
-        `http://localhost:3000/route?start_address=${start}&end_address=${end}`
+        `http://localhost:3000/route?start_address=${start}&end_address=${end}&safety=${safety}`
       )
       .then((res) => {
         const features = [] as ExtendedFeature[];
@@ -103,7 +142,7 @@ export default class App extends React.Component<{}, AppState> {
             direction: any;
             edge: {
               geometry: GeoJSON.MultiLineString;
-              road: {id: number; name: string;};
+              road: { id: number; name: string };
               a_name: string;
               b_name: string;
             };
@@ -136,32 +175,48 @@ export default class App extends React.Component<{}, AppState> {
         });
       })
       .catch((err) => {
-        console.log(err);
-        this.setState({ loading: false });
+        this.setState({
+          loading: false,
+          mode: Mode.SEARCH,
+        });
+        this.setError(err.response.data);
       });
   }
 
   // fix this
   toggleView = (): void => {
-    if (this.state.mode === Mode.FULLVIEW && this.state.step !== null) {
-      this.setState({ mode: Mode.DIRECTIONS, zoom: ZOOM_IN });
+    if (this.state.mode === Mode.SEARCH && this.state.step !== null) {
+      this.setState({ mode: Mode.DIRECTIONS });
     } else {
-      this.setState({ mode: Mode.FULLVIEW, zoom: ZOOM_OUT });
+      this.setState({ mode: Mode.SEARCH });
     }
     if (this.state.step !== null) {
       this.updateStep(this.state.step);
     }
   };
 
+  setError = (error: string): void => {
+    this.setState({ error });
+    setTimeout(() => {
+      this.setState({ error: null });
+    }, 5000);
+  };
+
+  // could move className App into its own class and pass children props
+  // def can make this cleaner
   render(): React.ReactNode {
-    return (
-      <div className="App">
-        {this.state.loading ? (
-          <div id="loading">Loading...</div>
-        ) : (
-          <Search submitSearch={this.search} />
-        )}
-        {Object.keys(this.state.mapData).length > 0 && (
+    const searchMode = (
+      <>
+        <Search submitSearch={this.search} />
+        <ErrorBar error={this.state.error} />
+      </>
+    );
+    let main = (
+      <MapLoading message={"Loading..."} current={this.state.current} />
+    );
+    if (!this.state.loading) {
+      main = (
+        <>
           <Map
             current={this.state.current}
             step={this.state.step}
@@ -170,19 +225,47 @@ export default class App extends React.Component<{}, AppState> {
             directions={this.state.directions}
             zoom={this.state.zoom}
           />
-        )}
-        <div id="direction-container">
           {this.state.step !== null && this.state.directions && (
-            <Directions
-              updateStep={this.updateStep}
-              step={this.state.step}
-              directions={this.state.directions}
-            />
+            <div id="direction-container">
+              <div id="directions-top-bar">
+                <DirectionsViewer directions={this.state.directions} />
+              </div>
+              <div id="direction-bottom-bar">
+                <Directions
+                  updateStep={this.updateStep}
+                  step={this.state.step}
+                  directions={this.state.directions}
+                />
+                <ToggleMode
+                  mode={
+                    (this.state.mode as Mode) === Mode.SEARCH
+                      ? Mode.DIRECTIONS
+                      : Mode.SEARCH
+                  }
+                  toggleMode={this.toggleView}
+                />
+              </div>
+            </div>
           )}
-          {this.state.mode && this.state.step !== null && (
-            <ToggleMode mode={this.state.mode} toggleMode={this.toggleView} />
-          )}
-        </div>
+        </>
+      );
+    }
+
+    const currentColours = backgroundColourByTime(
+      //this.state.currentDate.getHours()
+      5
+    );
+    console.log(currentColours.innerColour);
+
+    return (
+      <div
+        className="App"
+        style={{
+          background: `radial-gradient(${currentColours.innerColour}, ${currentColours.outerColour})`,
+        }}
+      >
+        {this.state.mode === Mode.SEARCH ? searchMode : main}
+        <ErrorBar error={this.state.error} />
       </div>
     );
   }

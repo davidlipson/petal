@@ -13,7 +13,7 @@ exports.centreline = void 0;
 const graph_1 = require("../graph");
 const centreline = (pool, start_address, end_address) => __awaiter(void 0, void 0, void 0, function* () {
     const road_types = Object.keys(graph_1.WEIGHTS).filter((w) => graph_1.WEIGHTS[parseInt(w)] > 0);
-    const results = yield pool.query(`with basic_graph as (select * from centreline_graph_v2 cgv where road_type = ANY ($1)), 
+    const results = yield pool.query(`with basic_graph as (select * from centreline_w_bikes_v2 cgv where road_type = ANY ($1)), 
     startadd as (select *, 'START-TERMINUS' node_name from address a where (concat(address, ' ', lfname) = $2)  limit 1),
       endadd as (select *, 'END-TERMINUS' node_name from address a where (concat(address, ' ', lfname) = $3) limit 1),
       nodes as 
@@ -42,7 +42,7 @@ const centreline = (pool, start_address, end_address) => __awaiter(void 0, void 
     len),ST_TRANSLATE(split_point,sin(az2) * len, cos(az2) * len))) divisions from graph),
     divisions_mid as (select *, st_touches(st_geometryn(divisions, 1), a) touches_a, st_geometryn(divisions, 1) new_street_geom from new_segments where st_touches(st_geometryn(divisions, 1), b) or st_touches(st_geometryn(divisions, 1), a) union select *, st_touches(st_geometryn(divisions, 2), a) touches_a, st_geometryn(divisions, 2) new_street_geom from new_segments where st_touches(st_geometryn(divisions, 2), a) or st_touches(st_geometryn(divisions, 2), b)),
     divisions as (select *, st_length(new_street_geom)/st_length(geom) length_frac from divisions_mid),
-    newGraph as (select cgv.road_type, 
+    newGraph as (select cgv.edge_id, cgv.bike_lanes, cgv.road_type, 
     (case when divisions.node_name = 'START-TERMINUS' then 
     divisions.split_point else (case when divisions.node_name = 'END-TERMINUS' and not divisions.touches_a then cgv.b else cgv.a end) end) as a_geometry, 
     (case when divisions.node_name = 'END-TERMINUS' then 
@@ -56,10 +56,10 @@ const centreline = (pool, start_address, end_address) => __awaiter(void 0, void 
     (case when divisions.node_name = 'END-TERMINUS' then
     divisions.node_name else(case when divisions.node_name = 'START-TERMINUS' and divisions.touches_a then cgv.a_name else cgv.b_name end) end) as b_name
     from basic_graph cgv left join divisions on cgv.a_name = divisions.a_name and cgv.b_name = divisions.b_name),
-    startingPoint as (select distinct ng.road_type, sa.geom a_geometry, a_geometry b_geometry, ng.street_name, 0 departing_angle, 0 arriving_angle, st_makeline(st_setsrid(sa.geom, 4326), ng.a_geometry) geometry, 1 street_length, 'CURRENT-POSITION' a_name, ng.a_name b_name from newGraph ng inner join startadd sa on ng.a_name like '%START-TERMINUS%'),
-    endingPoint as (select distinct ng.road_type,ng.b_geometry a_geometry, sa.geom b_geometry, ng.street_name, 0 departing_angle, 0 arriving_angle, st_makeline(ng.b_geometry, st_setsrid(sa.geom, 4326)) geometry, 1 street_length, ng.b_name a_name, 'ENDING-POSITION' b_name from newGraph ng inner join endadd sa on ng.b_name like '%END-TERMINUS%'),
+    startingPoint as (select distinct ng.edge_id, ng.bike_lanes, ng.road_type, sa.geom a_geometry, a_geometry b_geometry, ng.street_name, 0 departing_angle, 0 arriving_angle, st_makeline(st_setsrid(sa.geom, 4326), ng.a_geometry) geometry, 1 street_length, 'CURRENT-POSITION' a_name, ng.a_name b_name from newGraph ng inner join startadd sa on ng.a_name like '%START-TERMINUS%'),
+    endingPoint as (select distinct ng.edge_id, ng.bike_lanes, ng.road_type,ng.b_geometry a_geometry, sa.geom b_geometry, ng.street_name, 0 departing_angle, 0 arriving_angle, st_makeline(ng.b_geometry, st_setsrid(sa.geom, 4326)) geometry, 1 street_length, ng.b_name a_name, 'ENDING-POSITION' b_name from newGraph ng inner join endadd sa on ng.b_name like '%END-TERMINUS%'),
     finalUnion as (select * from endingPoint union select * from startingPoint union select * from newGraph)
-    select road_type, st_asgeojson(a_geometry) a_geometry, st_asgeojson(b_geometry) b_geometry, street_name, departing_angle, arriving_angle, st_asgeojson(geometry) geometry,  street_length, a_name, b_name from finalUnion`, [road_types, start_address, end_address]);
+    select road_type, st_asgeojson(a_geometry) a_geometry, st_asgeojson(b_geometry) b_geometry, street_name, departing_angle, arriving_angle, st_asgeojson(geometry) geometry, street_length, a_name, b_name, bike_lanes from finalUnion`, [road_types, start_address, end_address]);
     return results.rows;
 });
 exports.centreline = centreline;

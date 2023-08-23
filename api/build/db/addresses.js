@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addressesSuggestions = void 0;
 const addressesSuggestions = (pool, address) => __awaiter(void 0, void 0, void 0, function* () {
-    const results = yield pool.query(`select concat(address,' ',lfname) as name  from address order by similarity(concat(address, ' ', lfname), '${address}') desc limit 5`);
+    const results = yield pool.query(`select concat(address,' ',lfname) as name  from address order by similarity(concat(address, ' ', lfname), '${address}') desc limit 3`);
     return results.rows;
 });
 exports.addressesSuggestions = addressesSuggestions;

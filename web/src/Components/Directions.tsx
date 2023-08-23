@@ -38,10 +38,24 @@ export class Directions extends React.Component<DirectionsProps, {}> {
 
   render() {
     const direction = this.props.directions[this.props.step];
+    const perc = Math.floor(
+      (100 * this.props.step) / (this.props.directions.length - 1)
+    );
+    const col = (255 * this.props.step) / (this.props.directions.length - 1);
     return (
       <div id="route-info">
+        <div id="progress-bar">
+          <div
+            style={{
+              backgroundColor: `rgb(${255 - col},${col},0)`,
+              width: `${perc}%`,
+            }}
+            id={perc === 100 ? `complete-progress` : ''}
+          ></div>
+        </div>
         <div className="route-info-header">
-          {direction.directive}
+          {direction.edge.street_name} - {direction.edge.road.name} -{" "}
+          {direction.edge.bike_lanes.length > 0 ? "Bike Lane" : "No Bike Lane"}
         </div>
       </div>
     );

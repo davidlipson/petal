@@ -2,7 +2,6 @@ import axios from "axios";
 import { ExtendedFeature, ExtendedFeatureCollection } from "d3-geo";
 import React from "react";
 import { BaseLayerProps } from "./Street";
-import { ZOOM_IN } from "../../App";
 
 export interface BikeShareState {
   layer: ExtendedFeatureCollection | null;
@@ -52,7 +51,7 @@ export class BikeShareBaseLayer extends React.Component<
 
   render(): React.ReactNode {
     if (
-      (this.props.zoom && this.props.zoom > ZOOM_IN) ||
+      (this.props.zoom && this.props.zoom > 0.5) ||
       this.props.hide ||
       this.state.layer === undefined
     )
@@ -69,7 +68,7 @@ export class BikeShareBaseLayer extends React.Component<
               opacity={0.2}
               stroke="white"
               strokeWidth={2}
-              r={16}
+              r={10}
             />
             <circle
               key={"bike-share-outer" + i}
@@ -78,7 +77,7 @@ export class BikeShareBaseLayer extends React.Component<
               fill="white"
               stroke="rgb(42,100,75)"
               strokeWidth={2}
-              r={12}
+              r={7}
             />
             <circle
               key={"bike-share" + i}
@@ -87,7 +86,7 @@ export class BikeShareBaseLayer extends React.Component<
               fill="rgb(78,171,80)"
               stroke="rgb(42,100,75)"
               strokeWidth={3}
-              r={8}
+              r={4}
             />
           </>
         ))}
