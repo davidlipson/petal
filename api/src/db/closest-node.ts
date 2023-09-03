@@ -1,5 +1,7 @@
 import { Client, Pool } from "pg";
 
+// not used anymore
+/*
 export const closestNode = async (pool: Pool, address: string) => {
   const result = await pool.query(`
     with start as 
@@ -19,3 +21,4 @@ export const closestNode = async (pool: Pool, address: string) => {
   }
   return result.rows[0];
 };
+*/

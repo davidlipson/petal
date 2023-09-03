@@ -40,7 +40,9 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const routes_1 = require("./routes");
+const new_db_1 = require("./new-db");
 (() => __awaiter(void 0, void 0, void 0, function* () {
+    yield new_db_1.sequelize.sync();
     dotenv.config();
     const PORT = 3000;
     const app = (0, express_1.default)();
