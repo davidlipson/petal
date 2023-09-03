@@ -37,7 +37,7 @@ export class Search extends React.Component<SearchProps, SearchState> {
       .get(`http://localhost:3000/addresses?address=${address}`)
       .then((response) => {
         const suggestions = response.data.map(
-          (address: { name: string }) => address.name
+          (address: { full_address: string }) => address.full_address
         );
         if (start) {
           this.setState({ start_suggestions: suggestions });

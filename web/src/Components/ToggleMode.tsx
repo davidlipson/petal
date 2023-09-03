@@ -24,7 +24,6 @@ export class ToggleMode extends React.Component<
 
   // change this to dynamic, moving across screen instead of stationary center
   render(): React.ReactNode {
-    console.log(this.state);
     if (this.state.show) {
       return (
         <div onClick={this.props.toggleMode} id="toggle-mode">

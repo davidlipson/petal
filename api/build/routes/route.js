@@ -12,9 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.route = void 0;
 const db_1 = require("../db");
 const graph_1 = require("../graph");
-const pool_1 = require("../pool");
 const route = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const pool = pool_1.poolInstance.getPool();
     const { start_address, end_address, safety } = req.query;
     const safetyLevel = Math.max(0, Math.min(4, parseInt(safety) || 0));
     if (!start_address || !end_address) {
@@ -22,13 +20,12 @@ const route = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
     try {
-        const rows = yield (0, db_1.centreline)(pool, start_address, end_address);
+        const rows = yield (0, db_1.centreline)(start_address, end_address);
         const graph = new graph_1.RouteGraph(rows, safetyLevel);
         const directions = graph.getDirections();
         return res.status(200).json({ directions });
     }
     catch (e) {
-        console.log(e);
         res.status(400).send(e.message);
         return;
     }

@@ -1,8 +1,12 @@
-import { Pool } from "pg";
+import { db } from "./db";
 
-export const addressesSuggestions = async (pool: Pool, address: string) => {
-  const results = await pool.query(
-    `select concat(address,' ',lfname) as name  from address order by similarity(concat(address, ' ', lfname), '${address}') desc limit 3`
-  );
-  return results.rows;
+export const addressesSuggestions = async (address: string) => {
+  const query = ` 
+    select 
+      full_address
+    from addresses
+    order by 
+      similarity(full_address, '${address}') desc limit 3`;
+  const [rows, _result] = await db.query(query);
+  return rows;
 };

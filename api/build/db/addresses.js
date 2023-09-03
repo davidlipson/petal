@@ -10,8 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addressesSuggestions = void 0;
-const addressesSuggestions = (pool, address) => __awaiter(void 0, void 0, void 0, function* () {
-    const results = yield pool.query(`select concat(address,' ',lfname) as name  from address order by similarity(concat(address, ' ', lfname), '${address}') desc limit 3`);
-    return results.rows;
+const db_1 = require("./db");
+const addressesSuggestions = (address) => __awaiter(void 0, void 0, void 0, function* () {
+    const query = ` 
+    select 
+      full_address
+    from addresses
+    order by 
+      similarity(full_address, '${address}') desc limit 3`;
+    const [rows, _result] = yield db_1.db.query(query);
+    return rows;
 });
 exports.addressesSuggestions = addressesSuggestions;

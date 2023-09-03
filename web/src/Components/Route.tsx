@@ -51,8 +51,8 @@ export class RouteLayer extends React.Component<RouteProps> {
                   opacity={0.7}
                   fill="none"
                   stroke-dasharray={
-                    d.properties?.a_name === "CURRENT-POSITION" ||
-                    d.properties?.b_name === "ENDING-POSITION"
+                    d.properties?.a_intersection === "CURRENT-POSITION" ||
+                    d.properties?.b_intersection === "ENDING-POSITION"
                       ? 3
                       : 0
                   }

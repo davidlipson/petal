@@ -17,37 +17,6 @@ export class BikeShareBaseLayer extends React.Component<
       layer: null,
     };
   }
-  componentDidMount(): void {
-    axios
-      .get(
-        `https://tor.publicbikesystem.net/ube/gbfs/v1/en/station_information`
-      )
-      .then((results) => {
-        if (results.data?.data?.stations?.length > 0) {
-          const features: ExtendedFeature[] = results.data.data.stations.map(
-            (station: any) => {
-              return {
-                type: "Feature",
-                geometry: {
-                  type: "Point",
-                  coordinates: [station.lon, station.lat],
-                },
-                properties: station,
-              };
-            }
-          );
-          this.setState({
-            layer: {
-              type: "FeatureCollection",
-              features,
-            },
-          });
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }
 
   render(): React.ReactNode {
     if (

@@ -17,4 +17,3 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./addresses"), exports);
 __exportStar(require("./base"), exports);
 __exportStar(require("./route"), exports);
-__exportStar(require("./tile"), exports);

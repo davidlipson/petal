@@ -4,6 +4,7 @@ import { Clouds, CurrentPin, MapLoading, RouteLayer } from "./Components";
 import {
   BikeLaneBaseLayer,
   BikeShareBaseLayer,
+  BlocksBaseLayer,
   LightsBaseLayer,
   ParksBaseLayer,
   PropertyBaseLayer,
@@ -75,6 +76,7 @@ class Map extends React.Component<MapProps> {
               path={path}
               layer={this.props.mapData.properties}
             />
+            <BlocksBaseLayer path={path} layer={this.props.mapData.blocks} />
             <ParksBaseLayer path={path} layer={this.props.mapData.parks} />
             <RouteLayer
               directions={this.props.directions}

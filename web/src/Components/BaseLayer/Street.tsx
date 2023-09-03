@@ -32,12 +32,13 @@ export class StreetsBaseLayer extends React.Component<BaseLayerProps> {
   }
 
   render() {
+    return <></>; // use street edges?
     if (this.props.hide || this.props.layer === undefined) return <></>;
     let renderedStreets: Record<string, number> = {};
     return this.props.layer?.features?.map((d, i) => {
       renderedStreets[d.properties?.street_name] =
         renderedStreets[d.properties?.street_name] + 1 || 0;
-      const renderStreetName = false // renderedStreets[d.properties?.street_name] === 0;
+      const renderStreetName = false; // renderedStreets[d.properties?.street_name] === 0;
       return (
         <>
           <path
@@ -45,9 +46,8 @@ export class StreetsBaseLayer extends React.Component<BaseLayerProps> {
             id={"street-line" + i}
             d={this.props.path(d) as string}
             stroke="#fef1C0"
-            strokeWidth={this.streetWidth(d.properties?.street_type)}
+            strokeWidth={5}
             fill="none"
-            strokeDasharray="8 20"
           />
           {renderStreetName && (
             <text className="street-text" fill="#000055" fontSize={5}>

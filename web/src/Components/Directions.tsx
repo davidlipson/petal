@@ -50,13 +50,10 @@ export class Directions extends React.Component<DirectionsProps, {}> {
               backgroundColor: `rgb(${255 - col},${col},0)`,
               width: `${perc}%`,
             }}
-            id={perc === 100 ? `complete-progress` : ''}
+            id={perc === 100 ? `complete-progress` : ""}
           ></div>
         </div>
-        <div className="route-info-header">
-          {direction.edge.street_name} - {direction.edge.road.name} -{" "}
-          {direction.edge.bike_lanes.length > 0 ? "Bike Lane" : "No Bike Lane"}
-        </div>
+        <div className="route-info-header"></div>
       </div>
     );
   }

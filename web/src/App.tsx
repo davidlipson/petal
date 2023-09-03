@@ -11,7 +11,6 @@ import {
   Search,
   ToggleMode,
 } from "./Components";
-import { time } from "console";
 import { backgroundColourByTime } from "./helpers";
 
 export enum Mode {
@@ -63,13 +62,12 @@ export default class App extends React.Component<{}, AppState> {
   // add closest address from current location on mount
 
   setBaseLayer(lat?: number, long?: number): void {
-    if (lat && long) {
+    if (lat && long && this.state.mode === Mode.DIRECTIONS) {
       axios
         .get(
           `http://localhost:3000/base?km=${this.state.zoom}&lat=${lat}&long=${long}`
         )
         .then((res) => {
-          console.log(res);
           this.setState({
             mapData: res.data,
             current: {
@@ -88,7 +86,6 @@ export default class App extends React.Component<{}, AppState> {
   success = (position: GeolocationPosition): void => {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
-    console.log("Current location", latitude, longitude);
     this.setBaseLayer(latitude, longitude);
   };
 
@@ -142,9 +139,8 @@ export default class App extends React.Component<{}, AppState> {
             direction: any;
             edge: {
               geometry: GeoJSON.MultiLineString;
-              road: { id: number; name: string };
-              a_name: string;
-              b_name: string;
+              a_intersection: string;
+              b_intersection: string;
             };
           }) => {
             directions.push(direction);
@@ -152,9 +148,8 @@ export default class App extends React.Component<{}, AppState> {
               type: "Feature",
               geometry: direction.edge.geometry,
               properties: {
-                road: direction.edge.road,
-                a_name: direction.edge.a_name,
-                b_name: direction.edge.b_name,
+                a_intersection: direction.edge.a_intersection,
+                b_intersection: direction.edge.b_intersection,
               },
             });
           }
